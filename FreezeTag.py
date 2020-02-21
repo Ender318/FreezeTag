@@ -89,4 +89,4 @@ async def rules(ctx):
 
 
 
-bot.run('Njc5NzY5MjQwNzQ3NjM4Nzg0.Xk2Ksg.REUBZ5WVAoBjvYEYSbnypoxcrN0')
+bot.run('TOKEN')
