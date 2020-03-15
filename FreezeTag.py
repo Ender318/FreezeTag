@@ -5,6 +5,7 @@ from discord.ext import commands
 bot = commands.Bot(command_prefix='!')
 client = discord.Client()
 players = []
+playersid = []
 tagged = []
 
 
@@ -19,8 +20,6 @@ async def start(ctx):
         for i in roles:
             if i == gameManager:
                 time1 = time.time()
-                message = 'worked'
-                await ctx.send(message)
                 bool = True
                 break
             else:
@@ -31,15 +30,16 @@ async def start(ctx):
             message = 'Only the Game Manager can start the game.'
             await ctx.send(message)
 
-    for i in players:
+    for i in range(players.__len__()):
         player = players[i]
         it = discord.utils.get(ctx.guild.roles, name='It')
         for role in player.roles:
             if role == it:
-                players.remove(i)
+                del playersid[i]
+                break
             else:
                 pass
-    players.sort()
+    playersid.sort()
 
 
 # enters a user into the game; assigns Tag Player Role
@@ -47,6 +47,7 @@ async def start(ctx):
 async def join(ctx):
     player = ctx.message.author
     players.append(player)
+    playersid.append(player.id)
     role = discord.utils.get(ctx.guild.roles, name='Tag Player')
     await player.add_roles(role)
     response = 'You joined the game'
@@ -68,9 +69,10 @@ async def tag(ctx):
                 if player.status == discord.Status.online:
                     frozen = discord.utils.get(ctx.guild.roles, name='Frozen')
                     await player.add_roles(frozen)
-                    tagged.append(player)
+                    tagged.append(player.id)
                     tagged.sort()
-                    if players == tagged:
+                    if playersid == tagged:
+                        ctx.message.author.add_roles(frozen)
                         await endGame(ctx)
                     else:
                         pass
@@ -118,8 +120,18 @@ async def endGame(ctx):
     hours = gameTime // 3600
     minutes = gameTime // 60
     seconds = gameTime % 3600
-    message = 'The game time was ' + str(hours) + 'hours, ' + str(minutes) + 'minutes, and ' + str(seconds) + 'seconds.'
+    message = 'The game time was ' + str(hours) + ' hours, ' + str(minutes) + ' minutes, and ' \
+                                                                              '' + str(seconds) + ' seconds.'
     await ctx.send(message)
+
+    tagPlayer = discord.utils.get(ctx.guild.roles, name='Tag Player')
+    frozen = discord.utils.get(ctx.guild.roles, name='Frozen')
+    for i in range(players.__len__()):
+        player = players[i]
+        player.remove_roles(tagPlayer)
+        player.remove_roles(frozen)
+    players.clear()
+    playersid.clear()
 
 
 # returns the status of a user
