@@ -164,4 +164,4 @@ async def rules(ctx):
     await ctx.send(message)
 
 
-bot.run('TOKEN')
+bot.run('token')
